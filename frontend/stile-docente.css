@@ -1,0 +1,115 @@
+.dashboard {
+  max-width: 700px;
+}
+
+.intestazione {
+  text-align: left;
+  margin-bottom: 1.5rem;
+}
+
+.intestazione h2 {
+  font-size: 1.4rem;
+  margin-bottom: 0.3rem;
+}
+
+.codice-grande {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 1.3rem;
+  color: #E8B341;
+  letter-spacing: 0.15em;
+}
+NE
+.pannello {
+  background: #1E2226;
+  border: 1px solid #33383D;
+  border-radius: 12px;
+  padding: 1.2rem;
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.pannello input,
+.pannello select {
+  width: 100%;
+  background: #14171A;
+  border: 2px solid #33383D;
+  color: #F2F0EB;
+  border-radius: 8px;
+  padding: 0.7rem;
+  margin-bottom: 0.7rem;
+  font-size: 1rem;
+}
+
+.btn-secondario {
+  background: transparent;
+  border: 2px solid #E8B341;
+  color: #E8B341;
+}
+
+.riga-round {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.dash-timer {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #E8B341;
+  min-width: 80px;
+}
+
+.dash-etichetta {
+  flex: 1;
+  font-size: 1.1rem;
+  color: #A8A6A0;
+}
+
+.risultati-live {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.barra-risultato {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.barra-risultato .etichetta-opzione {
+  min-width: 100px;
+  font-size: 0.95rem;
+}
+
+.barra-risultato .barra-contenitore {
+  flex: 1;
+  background: #14171A;
+  border-radius: 6px;
+  height: 24px;
+  overflow: hidden;
+}
+
+.barra-risultato .barra-riempimento {
+  background: #E8B341;
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.barra-risultato .conteggio {
+  min-width: 30px;
+  text-align: right;
+  font-weight: 600;
+}
+
+.lista-storico {
+  margin-top: 1rem;
+}
+
+.voce-storico {
+  border-top: 1px solid #33383D;
+  padding: 0.7rem 0;
+  font-size: 0.9rem;
+}

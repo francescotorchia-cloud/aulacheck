@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AulaCheck — Docente</title>
+  <link rel="stylesheet" href="stile.css">
+  <link rel="stylesheet" href="stile-docente.css">
+</head>
+<body>
+
+  <main id="schermata-login" class="schermata">
+    <h1 class="logo">AulaCheck</h1>
+    <p class="sottotitolo">Accesso docente</p>
+    <input type="email" id="input-email" placeholder="email@esempio.com" autocomplete="username">
+    <input type="password" id="input-password" placeholder="Password" autocomplete="current-password">
+    <button id="btn-login">Accedi</button>
+    <p id="errore-login" class="errore"></p>
+  </main>
+
+  <main id="schermata-crea" class="schermata nascosta">
+    <h1 class="logo">AulaCheck</h1>
+    <p class="sottotitolo">Nuova sessione</p>
+    <input type="text" id="input-titolo" placeholder="Titolo della lezione">
+    <select id="input-tipo">
+      <option value="comprehension">Comprensione (confuso / ok / perso)</option>
+      <option value="debate">Dibattito (squadra A / squadra B / neutro)</option>
+    </select>
+    <button id="btn-crea">Crea sessione</button>
+  </main>
+
+  <main id="dashboard" class="dashboard nascosta">
+    <header class="intestazione">
+      <div>
+        <h2 id="dash-titolo"></h2>
+        <p class="codice-grande">Codice: <span id="dash-codice"></span></p>
+      </div>
+    </header>
+
+    <section id="pannello-attesa" class="pannello">
+      <input type="text" id="input-etichetta" placeholder="Etichetta round (facoltativa)">
+      <input type="number" id="input-durata" placeholder="Durata secondi" value="15" min="5">
+      <button id="btn-avvia-round">Avvia round</button>
+    </section>
+
+    <section id="pannello-round" class="pannello nascosta">
+      <div class="riga-round">
+        <div id="dash-timer" class="dash-timer">--</div>
+        <p id="dash-etichetta" class="dash-etichetta"></p>
+        <button id="btn-chiudi-round" class="btn-secondario">Chiudi round</button>
+      </div>
+      <div id="risultati-live" class="risultati-live"></div>
+    </section>
+
+    <section class="pannello">
+      <button id="btn-storico" class="btn-secondario">Mostra storico</button>
+      <div id="lista-storico" class="lista-storico nascosta"></div>
+    </section>
+  </main>
+
+  <script src="docente.js"></script>
+</body>
+</html>
