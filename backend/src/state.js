@@ -1,4 +1,5 @@
 const DURATA_ROUND_DEFAULT_SECONDI = 15;
+const { broadcast } = require('./ws');
 
 const OPZIONI_DEFAULT = {
   comprehension: ['confuso', 'ok', 'perso'],
@@ -7,6 +8,7 @@ const OPZIONI_DEFAULT = {
 
 const sessioni = new Map();
 const timersAttivi = new Map();
+
 
 function generaId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
@@ -69,6 +71,9 @@ function registraVoto(sessioneId, clientId, valore) {
   if (!round.opzioni.includes(valore)) return null;
 
   round.voti[clientId] = valore;
+
+  broadcast(sessioneId, { tipo: 'aggiornamento-voti', conteggio: aggregaVoti(round) });
+
   return round;
 }
 
@@ -102,6 +107,8 @@ function chiudiRound(sessioneId) {
   sessione.roundAttivo = null;
 
   console.log(`Round ${round.id} chiuso alle ${new Date(round.terminatoIl).toLocaleTimeString()}`);
+
+  broadcast(sessioneId, { tipo: 'round-chiuso', conteggio: aggregaVoti(round) });
 
   return round;
 }

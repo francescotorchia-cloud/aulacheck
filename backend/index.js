@@ -43,6 +43,13 @@ app.get('/test-aggregazione/:sessioneId', (req, res) => {
   res.json(aggregaVoti(round));
 });
 
-app.listen(port, () => {
+/* */
+const http = require('http');
+const { avviaWebSocket } = require('./src/ws');
+
+const server = http.createServer(app);
+avviaWebSocket(server);
+
+server.listen(port, () => {
   console.log(`Server in ascolto sulla porta ${port}`);
 });
