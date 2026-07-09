@@ -50,38 +50,36 @@ app.post('/sessioni', richiedeAuth, (req, res) => {
   res.json(sessione);
 });
 
-app.get('/test-sessione', (req, res) => {
-  const sessione = creaSessione('comprehension', 'Prova');
+app.get('/sessioni/:id', (req, res) => {
+  const sessione = getSessione(req.params.id);
+  if (!sessione) return res.status(404).json({ errore: 'sessione non trovata' });
   res.json(sessione);
 });
 
-app.get('/test-round', (req, res) => {
-  const sessione = creaSessione('comprehension', 'Prova Round');
-  const round = avviaRound(sessione.id, 'Test etichetta', null, 20);
-  res.json({ sessioneId: sessione.id, round });
+app.post('/sessioni/:id/round', richiedeAuth, (req, res) => {
+  const { etichetta, opzioni, durataSecondi } = req.body;
+  const round = avviaRound(req.params.id, etichetta, opzioni, durataSecondi);
+  if (!round) return res.status(404).json({ errore: 'sessione non trovata' });
+  res.json(round);
 });
 
-app.get('/test-voto/:sessioneId/:valore{/:clientId}', (req, res) => {
-  const clientId = req.params.clientId || 'client-prova';
-  const round = registraVoto(req.params.sessioneId, clientId, req.params.valore);
+app.post('/sessioni/:id/round/chiudi', richiedeAuth, (req, res) => {
+  const round = chiudiRound(req.params.id);
+  if (!round) return res.status(404).json({ errore: 'nessun round attivo su questa sessione' });
+  res.json(round);
+});
+
+app.post('/sessioni/:id/voto', (req, res) => {
+  const { clientId, valore } = req.body;
+  const round = registraVoto(req.params.id, clientId, valore);
   if (!round) return res.status(400).json({ errore: 'voto non registrato (round non attivo o valore non valido)' });
   res.json(round);
 });
 
-app.get('/test-sessione/:id', (req, res) => {
+app.get('/sessioni/:id/storico', richiedeAuth, (req, res) => {
   const sessione = getSessione(req.params.id);
-  if (!sessione) return res.status(404).json({ errore: 'non trovata' });
-  res.json(sessione);
-});
-
-app.get('/test-aggregazione/:sessioneId', (req, res) => {
-  const sessione = getSessione(req.params.sessioneId);
   if (!sessione) return res.status(404).json({ errore: 'sessione non trovata' });
-
-  const round = sessione.roundAttivo || sessione.storico[sessione.storico.length - 1];
-  if (!round) return res.status(404).json({ errore: 'nessun round trovato' });
-
-  res.json(aggregaVoti(round));
+  res.json(sessione.storico);
 });
 
 const http = require('http');
