@@ -72,6 +72,16 @@ function registraVoto(sessioneId, clientId, valore) {
   return round;
 }
 
+function aggregaVoti(round) {
+  const conteggio = {};
+  for (const opzione of round.opzioni) {
+    conteggio[opzione] = 0;
+  }
+  for (const valore of Object.values(round.voti)) {
+    conteggio[valore] = (conteggio[valore] || 0) + 1;
+  }
+  return conteggio;
+}
 
 function chiudiRound(sessioneId) {
   const sessione = sessioni.get(sessioneId);
@@ -96,4 +106,4 @@ function chiudiRound(sessioneId) {
   return round;
 }
 
-module.exports = { OPZIONI_DEFAULT, creaSessione, getSessione, avviaRound, chiudiRound, registraVoto };
+module.exports = { OPZIONI_DEFAULT, creaSessione, getSessione, avviaRound, chiudiRound, registraVoto, aggregaVoti };
