@@ -1,0 +1,137 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;700&family=Inter:wght@400;600&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #14171A;
+  color: #F2F0EB;
+  font-family: 'Inter', system-ui, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.schermata {
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+}
+
+.nascosta {
+  display: none;
+}
+
+.logo {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+
+.sottotitolo {
+  color: #A8A6A0;
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+}
+
+#input-codice {
+  width: 100%;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 1.5rem;
+  letter-spacing: 0.2em;
+  text-align: center;
+  text-transform: uppercase;
+  background: #1E2226;
+  border: 2px solid #33383D;
+  color: #F2F0EB;
+  border-radius: 8px;
+  padding: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+#input-codice:focus {
+  outline: none;
+  border-color: #E8B341;
+}
+
+button {
+  width: 100%;
+  background: #E8B341;
+  color: #14171A;
+  border: none;
+  font-size: 1.05rem;
+  font-weight: 600;
+  padding: 0.9rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+.errore {
+  color: #E24B4A;
+  margin-top: 0.8rem;
+  font-size: 0.9rem;
+  min-height: 1.2rem;
+}
+
+.stato-attesa {
+  color: #A8A6A0;
+  margin-top: 1rem;
+}
+
+.timer {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 4rem;
+  font-weight: 700;
+  color: #E8B341;
+  transition: color 0.3s ease;
+}
+
+.timer.urgente {
+  color: #E24B4A;
+}
+
+.etichetta-round {
+  color: #A8A6A0;
+  margin: 0.5rem 0 2rem;
+  font-size: 1.1rem;
+}
+
+.opzioni-voto {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.opzione-btn {
+  background: #1E2226;
+  border: 2px solid #33383D;
+  color: #F2F0EB;
+  font-size: 1.2rem;
+  font-weight: 600;
+  padding: 1.2rem;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.opzione-btn.selezionata {
+  border-color: #4F9D69;
+  background: #1B2A20;
+}
+
+.stato-voto {
+  margin-top: 1.5rem;
+  color: #4F9D69;
+  font-weight: 600;
+  min-height: 1.5rem;
+}
