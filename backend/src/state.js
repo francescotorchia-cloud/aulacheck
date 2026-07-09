@@ -66,6 +66,9 @@ function avviaRound(sessioneId, etichetta, opzioniCustom, durataSecondi = DURATA
   timersAttivi.set(round.id, timer);
 
   sessione.roundAttivo = round;
+
+  broadcast(sessioneId, { tipo: 'round-avviato', round });
+
   return round;
 }
 
