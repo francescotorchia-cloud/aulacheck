@@ -34,6 +34,13 @@ function getSessione(id) {
   return sessioni.get(id);
 }
 
+function getSessionePerCodice(codice) {
+  for (const sessione of sessioni.values()) {
+    if (sessione.codice === codice) return sessione;
+  }
+  return null;
+}
+
 function avviaRound(sessioneId, etichetta, opzioniCustom, durataSecondi = DURATA_ROUND_DEFAULT_SECONDI) {
   const sessione = sessioni.get(sessioneId);
   if (!sessione) return null;
@@ -113,4 +120,4 @@ function chiudiRound(sessioneId) {
   return round;
 }
 
-module.exports = { OPZIONI_DEFAULT, creaSessione, getSessione, avviaRound, chiudiRound, registraVoto, aggregaVoti };
+module.exports = { OPZIONI_DEFAULT, creaSessione, getSessione, getSessionePerCodice, avviaRound, chiudiRound, registraVoto, aggregaVoti };

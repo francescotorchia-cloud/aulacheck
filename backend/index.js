@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { creaSessione, avviaRound, chiudiRound, getSessione, registraVoto, aggregaVoti } = require('./src/state');
+const { creaSessione, avviaRound, chiudiRound, getSessione, getSessionePerCodice, registraVoto, aggregaVoti } = require('./src/state');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -52,6 +52,13 @@ app.post('/sessioni', richiedeAuth, (req, res) => {
 
 app.get('/sessioni/:id', (req, res) => {
   const sessione = getSessione(req.params.id);
+  if (!sessione) return res.status(404).json({ errore: 'sessione non trovata' });
+  res.json(sessione);
+});
+
+app.get('/sessioni/codice/:codice', (req, res) => {
+  const codice = req.params.codice.toUpperCase();
+  const sessione = getSessionePerCodice(codice);
   if (!sessione) return res.status(404).json({ errore: 'sessione non trovata' });
   res.json(sessione);
 });
