@@ -37,11 +37,21 @@
       </div>
     </header>
 
-    <section id="pannello-attesa" class="pannello">
-      <input type="text" id="input-etichetta" placeholder="Etichetta round (facoltativa)">
-      <input type="number" id="input-durata" placeholder="Durata secondi" value="15" min="5">
-      <button id="btn-avvia-round">Avvia round</button>
-    </section>
+   <section id="pannello-attesa" class="pannello">
+  <h3 style="margin-bottom: 0.8rem;">Pianifica round</h3>
+  <input type="text" id="input-etichetta-pianifica" placeholder="Etichetta round">
+  <input type="number" id="input-durata-pianifica" placeholder="Durata secondi" value="15" min="5">
+  <button id="btn-pianifica" class="btn-secondario">Aggiungi alla lista</button>
+
+  <div id="lista-pianificati" class="lista-pianificati"></div>
+
+  <button id="btn-round-successivo" style="margin-top: 1rem;">Round successivo</button>
+
+  <h3 style="margin: 1.5rem 0 0.8rem;">Oppure avvia al volo</h3>
+  <input type="text" id="input-etichetta" placeholder="Etichetta round (facoltativa)">
+  <input type="number" id="input-durata" placeholder="Durata secondi" value="15" min="5">
+  <button id="btn-avvia-round" class="btn-secondario">Avvia round</button>
+</section>
 
     <section id="pannello-round" class="pannello nascosta">
       <div class="riga-round">

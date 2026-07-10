@@ -28,6 +28,12 @@ const risultatiLive = document.getElementById('risultati-live');
 const btnStorico = document.getElementById('btn-storico');
 const listaStorico = document.getElementById('lista-storico');
 
+const inputEtichettaPianifica = document.getElementById('input-etichetta-pianifica');
+const inputDurataPianifica = document.getElementById('input-durata-pianifica');
+const btnPianifica = document.getElementById('btn-pianifica');
+const listaPianificati = document.getElementById('lista-pianificati');
+const btnRoundSuccessivo = document.getElementById('btn-round-successivo');
+
 let token = null;
 let sessioneId = null;
 let ws = null;
@@ -73,6 +79,40 @@ async function creaSessione() {
 
   connettiWebSocket();
   mostraSchermata(dashboard);
+  await aggiornaListaPianificati();
+}
+
+async function pianificaRound() {
+  await fai(`/sessioni/${sessioneId}/pianifica`, {
+    method: 'POST',
+    body: JSON.stringify({
+      etichetta: inputEtichettaPianifica.value,
+      durataSecondi: Number(inputDurataPianifica.value) || 15
+    })
+  });
+  inputEtichettaPianifica.value = '';
+  await aggiornaListaPianificati();
+}
+
+async function aggiornaListaPianificati() {
+  const lista = await fai(`/sessioni/${sessioneId}/pianificati`);
+
+  listaPianificati.innerHTML = '';
+  lista.forEach(p => {
+    const voce = document.createElement('div');
+    voce.className = 'voce-pianificata' + (p.lanciato ? ' lanciata' : '');
+    voce.textContent = `${p.ordine}. ${p.etichetta || '(senza etichetta)'} — ${p.durataSecondi}s`;
+    listaPianificati.appendChild(voce);
+  });
+}
+
+async function lanciaRoundSuccessivo() {
+  try {
+    await fai(`/sessioni/${sessioneId}/lancia-prossimo`, { method: 'POST' });
+    await aggiornaListaPianificati();
+  } catch (e) {
+    alert('Nessun round pianificato da lanciare');
+  }
 }
 
 function connettiWebSocket() {
@@ -185,3 +225,5 @@ btnCrea.addEventListener('click', creaSessione);
 btnAvviaRound.addEventListener('click', avviaRound);
 btnChiudiRound.addEventListener('click', chiudiRound);
 btnStorico.addEventListener('click', mostraStorico);
+btnPianifica.addEventListener('click', pianificaRound);
+btnRoundSuccessivo.addEventListener('click', lanciaRoundSuccessivo);

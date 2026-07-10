@@ -18,7 +18,7 @@
   color: #E8B341;
   letter-spacing: 0.15em;
 }
-NE
+
 .pannello {
   background: #1E2226;
   border: 1px solid #33383D;
@@ -112,4 +112,22 @@ NE
   border-top: 1px solid #33383D;
   padding: 0.7rem 0;
   font-size: 0.9rem;
+}
+
+.lista-pianificati {
+  margin: 0.8rem 0;
+}
+
+.voce-pianificata {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #33383D;
+  font-size: 0.9rem;
+}
+
+.voce-pianificata.lanciata {
+  opacity: 0.5;
+  text-decoration: line-through;
 }
