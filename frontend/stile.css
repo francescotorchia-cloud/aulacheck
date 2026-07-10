@@ -135,3 +135,99 @@ button:active {
   font-weight: 600;
   min-height: 1.5rem;
 }
+
+
+.lista-pianificati {
+  margin: 0.8rem 0;
+}
+
+.voce-pianificata {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #33383D;
+  font-size: 0.9rem;
+}
+
+.voce-pianificata.lanciata {
+  opacity: 0.5;
+  text-decoration: line-through;
+}
+
+.due-colonne {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+.colonna-destra {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.pannello h3 {
+  font-size: 1.05rem;
+  margin-bottom: 0.8rem;
+}
+
+.descrizione-pannello {
+  color: #A8A6A0;
+  font-size: 0.85rem;
+  margin-bottom: 0.8rem;
+}
+
+.voce-pianificata {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #14171A;
+  border: 1px solid #33383D;
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.voce-pianificata.lanciata {
+  opacity: 0.45;
+}
+
+.voce-pianificata .info-voce {
+  flex: 1;
+}
+
+.voce-pianificata .controlli-voce {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.voce-pianificata .controlli-voce button {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  font-size: 0.85rem;
+  background: transparent;
+  border: 1px solid #33383D;
+  color: #F2F0EB;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.voce-pianificata .controlli-voce button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.voce-pianificata .controlli-voce button.elimina {
+  border-color: #E24B4A;
+  color: #E24B4A;
+}
+
+@media (max-width: 640px) {
+  .due-colonne {
+    grid-template-columns: 1fr;
+  }
+}

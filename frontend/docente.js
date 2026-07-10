@@ -14,7 +14,7 @@ const btnCrea = document.getElementById('btn-crea');
 const dashTitolo = document.getElementById('dash-titolo');
 const dashCodice = document.getElementById('dash-codice');
 
-const pannelloAttesa = document.getElementById('pannello-attesa');
+const dueColonne = document.getElementById('due-colonne');
 const pannelloRound = document.getElementById('pannello-round');
 const inputEtichetta = document.getElementById('input-etichetta');
 const inputDurata = document.getElementById('input-durata');
@@ -96,14 +96,58 @@ async function pianificaRound() {
 
 async function aggiornaListaPianificati() {
   const lista = await fai(`/sessioni/${sessioneId}/pianificati`);
+  const nonLanciati = lista.filter(p => !p.lanciato);
 
   listaPianificati.innerHTML = '';
   lista.forEach(p => {
+    const indice = nonLanciati.findIndex(n => n.id === p.id);
+    const eSuPrimo = indice === 0;
+    const eUltimo = indice === nonLanciati.length - 1;
+
     const voce = document.createElement('div');
     voce.className = 'voce-pianificata' + (p.lanciato ? ' lanciata' : '');
-    voce.textContent = `${p.ordine}. ${p.etichetta || '(senza etichetta)'} — ${p.durataSecondi}s`;
+     voce.innerHTML = `
+    <span class="numero-ordine">${p.ordine}</span>
+    <span class="info-voce">
+    <span class="etichetta-voce">${p.etichetta || '(senza etichetta)'}</span>
+    <span class="durata-voce">${p.durataSecondi}s</span>
+    </span>
+    <span class="controlli-voce">
+    <button class="su" ${p.lanciato || eSuPrimo ? 'disabled' : ''}>▲</button>
+    <button class="giu" ${p.lanciato || eUltimo ? 'disabled' : ''}>▼</button>
+    <button class="elimina" ${p.lanciato ? 'disabled' : ''}>✕</button>
+    </span>
+`;
+
+    if (!p.lanciato) {
+      voce.querySelector('.su').addEventListener('click', () => spostaPianificato(p.id, 'su'));
+      voce.querySelector('.giu').addEventListener('click', () => spostaPianificato(p.id, 'giu'));
+      voce.querySelector('.elimina').addEventListener('click', () => eliminaPianificato(p.id));
+    }
+
     listaPianificati.appendChild(voce);
   });
+}
+
+async function spostaPianificato(id, direzione) {
+  try {
+    await fai(`/sessioni/${sessioneId}/pianificati/${id}/sposta`, {
+      method: 'POST',
+      body: JSON.stringify({ direzione })
+    });
+    await aggiornaListaPianificati();
+  } catch (e) {
+    console.error('Spostamento non riuscito', e);
+  }
+}
+
+async function eliminaPianificato(id) {
+  try {
+    await fai(`/sessioni/${sessioneId}/pianificati/${id}`, { method: 'DELETE' });
+    await aggiornaListaPianificati();
+  } catch (e) {
+    console.error('Eliminazione non riuscita', e);
+  }
 }
 
 async function lanciaRoundSuccessivo() {
@@ -138,13 +182,13 @@ function connettiWebSocket() {
       disegnaRisultati(messaggio.conteggio);
       fermaTimer();
       pannelloRound.classList.add('nascosta');
-      pannelloAttesa.classList.remove('nascosta');
+      dueColonne.classList.remove('nascosta');
     }
   };
 }
 
 function mostraRoundAttivo(round) {
-  pannelloAttesa.classList.add('nascosta');
+  dueColonne.classList.add('nascosta');
   pannelloRound.classList.remove('nascosta');
   dashEtichetta.textContent = round.etichetta || '';
   disegnaRisultati(Object.fromEntries(round.opzioni.map(o => [o, 0])));

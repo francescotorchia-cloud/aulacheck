@@ -4,7 +4,7 @@ const path = require('path');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const pool = require('./src/db');
-const { creaSessione, avviaRound, chiudiRound, getSessione, getSessionePerCodice, registraVoto, aggregaVoti, pianificaRound, getRoundPianificati, lanciaProssimoPianificato } = require('./src/state');
+const { creaSessione, avviaRound, chiudiRound, getSessione, getSessionePerCodice, registraVoto, aggregaVoti, pianificaRound, getRoundPianificati, lanciaProssimoPianificato, eliminaRoundPianificato, spostaRoundPianificato } = require('./src/state');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -84,6 +84,19 @@ app.post('/sessioni/:id/pianifica', richiedeAuth, async (req, res) => {
 app.get('/sessioni/:id/pianificati', richiedeAuth, async (req, res) => {
   const lista = await getRoundPianificati(req.params.id);
   res.json(lista);
+});
+
+app.delete('/sessioni/:id/pianificati/:pianificatoId', richiedeAuth, async (req, res) => {
+  const eliminato = await eliminaRoundPianificato(req.params.id, req.params.pianificatoId);
+  if (!eliminato) return res.status(404).json({ errore: 'round pianificato non trovato o già lanciato' });
+  res.json({ eliminato: true });
+});
+
+app.post('/sessioni/:id/pianificati/:pianificatoId/sposta', richiedeAuth, async (req, res) => {
+  const { direzione } = req.body;
+  const spostato = await spostaRoundPianificato(req.params.id, req.params.pianificatoId, direzione);
+  if (!spostato) return res.status(400).json({ errore: 'spostamento non possibile' });
+  res.json({ spostato: true });
 });
 
 app.post('/sessioni/:id/lancia-prossimo', richiedeAuth, async (req, res) => {

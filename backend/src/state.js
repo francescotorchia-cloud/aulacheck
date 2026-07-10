@@ -194,6 +194,32 @@ async function getRoundPianificati(sessioneId) {
   }));
 }
 
+async function eliminaRoundPianificato(sessioneId, id) {
+  const risultato = await pool.query(
+    'DELETE FROM round_pianificati WHERE id = $1 AND sessione_id = $2 AND lanciato = false',
+    [id, sessioneId]
+  );
+  return risultato.rowCount > 0;
+}
+
+async function spostaRoundPianificato(sessioneId, id, direzione) {
+  const lista = await getRoundPianificati(sessioneId);
+  const nonLanciati = lista.filter(r => !r.lanciato);
+  const indice = nonLanciati.findIndex(r => r.id === id);
+  if (indice === -1) return false;
+
+  const indiceVicino = direzione === 'su' ? indice - 1 : indice + 1;
+  if (indiceVicino < 0 || indiceVicino >= nonLanciati.length) return false;
+
+  const corrente = nonLanciati[indice];
+  const vicino = nonLanciati[indiceVicino];
+
+  await pool.query('UPDATE round_pianificati SET ordine = $1 WHERE id = $2', [vicino.ordine, corrente.id]);
+  await pool.query('UPDATE round_pianificati SET ordine = $1 WHERE id = $2', [corrente.ordine, vicino.id]);
+
+  return true;
+}
+
 async function lanciaProssimoPianificato(sessioneId) {
   const risultato = await pool.query(
     'SELECT * FROM round_pianificati WHERE sessione_id = $1 AND lanciato = false ORDER BY ordine LIMIT 1',
@@ -219,5 +245,7 @@ module.exports = {
   aggregaVoti,
   pianificaRound,
   getRoundPianificati,
-  lanciaProssimoPianificato
+  lanciaProssimoPianificato,
+  eliminaRoundPianificato,
+  spostaRoundPianificato
 };
