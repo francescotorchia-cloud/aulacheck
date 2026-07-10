@@ -3,6 +3,7 @@ const express = require('express');
 const path = require('path');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const pool = require('./src/db');
 const { creaSessione, avviaRound, chiudiRound, getSessione, getSessionePerCodice, registraVoto, aggregaVoti } = require('./src/state');
 
 const app = express();
@@ -30,6 +31,8 @@ app.get('/health', (req, res) => {
   res.json({ status: 'up' });
 });
 
+
+
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -46,47 +49,47 @@ app.post('/login', async (req, res) => {
   res.json({ token });
 });
 
-app.post('/sessioni', richiedeAuth, (req, res) => {
+app.post('/sessioni', richiedeAuth, async (req, res) => {
   const { tipo, titolo } = req.body;
-  const sessione = creaSessione(tipo, titolo);
+  const sessione = await creaSessione(tipo, titolo);
   res.json(sessione);
 });
 
-app.get('/sessioni/:id', (req, res) => {
-  const sessione = getSessione(req.params.id);
+app.get('/sessioni/:id', async (req, res) => {
+  const sessione = await getSessione(req.params.id);
   if (!sessione) return res.status(404).json({ errore: 'sessione non trovata' });
   res.json(sessione);
 });
 
-app.get('/sessioni/codice/:codice', (req, res) => {
+app.get('/sessioni/codice/:codice', async (req, res) => {
   const codice = req.params.codice.toUpperCase();
-  const sessione = getSessionePerCodice(codice);
+  const sessione = await getSessionePerCodice(codice);
   if (!sessione) return res.status(404).json({ errore: 'sessione non trovata' });
   res.json(sessione);
 });
 
-app.post('/sessioni/:id/round', richiedeAuth, (req, res) => {
+app.post('/sessioni/:id/round', richiedeAuth, async (req, res) => {
   const { etichetta, opzioni, durataSecondi } = req.body;
-  const round = avviaRound(req.params.id, etichetta, opzioni, durataSecondi);
+  const round = await avviaRound(req.params.id, etichetta, opzioni, durataSecondi);
   if (!round) return res.status(404).json({ errore: 'sessione non trovata' });
   res.json(round);
 });
 
-app.post('/sessioni/:id/round/chiudi', richiedeAuth, (req, res) => {
-  const round = chiudiRound(req.params.id);
+app.post('/sessioni/:id/round/chiudi', richiedeAuth, async (req, res) => {
+  const round = await chiudiRound(req.params.id);
   if (!round) return res.status(404).json({ errore: 'nessun round attivo su questa sessione' });
   res.json(round);
 });
 
-app.post('/sessioni/:id/voto', (req, res) => {
+app.post('/sessioni/:id/voto', async (req, res) => {
   const { clientId, valore } = req.body;
-  const round = registraVoto(req.params.id, clientId, valore);
+  const round = await registraVoto(req.params.id, clientId, valore);
   if (!round) return res.status(400).json({ errore: 'voto non registrato (round non attivo o valore non valido)' });
   res.json(round);
 });
 
-app.get('/sessioni/:id/storico', richiedeAuth, (req, res) => {
-  const sessione = getSessione(req.params.id);
+app.get('/sessioni/:id/storico', richiedeAuth, async (req, res) => {
+  const sessione = await getSessione(req.params.id);
   if (!sessione) return res.status(404).json({ errore: 'sessione non trovata' });
   res.json(sessione.storico);
 });
