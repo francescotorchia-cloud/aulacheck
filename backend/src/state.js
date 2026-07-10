@@ -32,6 +32,7 @@ async function getSessione(id) {
   const sessione = risultato.rows[0];
   sessione.roundAttivo = await getRoundAttivoArricchito(id);
   sessione.storico = await getStorico(id);
+  sessione.roundPianificati = await getRoundPianificati(id);
   return sessione;
 }
 
@@ -162,4 +163,61 @@ async function chiudiRound(sessioneId) {
   return roundAttivo;
 }
 
-module.exports = { OPZIONI_DEFAULT, creaSessione, getSessione, getSessionePerCodice, avviaRound, chiudiRound, registraVoto, aggregaVoti };
+async function pianificaRound(sessioneId, etichetta, opzioniCustom, durataSecondi) {
+  const risultatoOrdine = await pool.query(
+    'SELECT COALESCE(MAX(ordine), 0) AS massimo FROM round_pianificati WHERE sessione_id = $1',
+    [sessioneId]
+  );
+  const ordine = risultatoOrdine.rows[0].massimo + 1;
+  const id = generaId();
+
+  await pool.query(
+    'INSERT INTO round_pianificati (id, sessione_id, etichetta, opzioni, ordine, lanciato, durata_secondi) VALUES ($1, $2, $3, $4, $5, false, $6)',
+    [id, sessioneId, etichetta || null, opzioniCustom ? JSON.stringify(opzioniCustom) : null, ordine, durataSecondi || DURATA_ROUND_DEFAULT_SECONDI]
+  );
+
+  return { id, sessioneId, etichetta, opzioni: opzioniCustom, ordine, lanciato: false, durataSecondi };
+}
+
+async function getRoundPianificati(sessioneId) {
+  const risultato = await pool.query(
+    'SELECT * FROM round_pianificati WHERE sessione_id = $1 ORDER BY ordine',
+    [sessioneId]
+  );
+  return risultato.rows.map(row => ({
+    id: row.id,
+    etichetta: row.etichetta,
+    opzioni: row.opzioni,
+    ordine: row.ordine,
+    lanciato: row.lanciato,
+    durataSecondi: row.durata_secondi
+  }));
+}
+
+async function lanciaProssimoPianificato(sessioneId) {
+  const risultato = await pool.query(
+    'SELECT * FROM round_pianificati WHERE sessione_id = $1 AND lanciato = false ORDER BY ordine LIMIT 1',
+    [sessioneId]
+  );
+  if (risultato.rows.length === 0) return null;
+
+  const pianificato = risultato.rows[0];
+
+  await pool.query('UPDATE round_pianificati SET lanciato = true WHERE id = $1', [pianificato.id]);
+
+  return await avviaRound(sessioneId, pianificato.etichetta, pianificato.opzioni, pianificato.durata_secondi);
+}
+
+module.exports = {
+  OPZIONI_DEFAULT,
+  creaSessione,
+  getSessione,
+  getSessionePerCodice,
+  avviaRound,
+  chiudiRound,
+  registraVoto,
+  aggregaVoti,
+  pianificaRound,
+  getRoundPianificati,
+  lanciaProssimoPianificato
+};

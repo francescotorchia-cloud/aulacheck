@@ -4,7 +4,7 @@ const path = require('path');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const pool = require('./src/db');
-const { creaSessione, avviaRound, chiudiRound, getSessione, getSessionePerCodice, registraVoto, aggregaVoti } = require('./src/state');
+const { creaSessione, avviaRound, chiudiRound, getSessione, getSessionePerCodice, registraVoto, aggregaVoti, pianificaRound, getRoundPianificati, lanciaProssimoPianificato } = require('./src/state');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -72,6 +72,23 @@ app.post('/sessioni/:id/round', richiedeAuth, async (req, res) => {
   const { etichetta, opzioni, durataSecondi } = req.body;
   const round = await avviaRound(req.params.id, etichetta, opzioni, durataSecondi);
   if (!round) return res.status(404).json({ errore: 'sessione non trovata' });
+  res.json(round);
+});
+
+app.post('/sessioni/:id/pianifica', richiedeAuth, async (req, res) => {
+  const { etichetta, opzioni, durataSecondi } = req.body;
+  const pianificato = await pianificaRound(req.params.id, etichetta, opzioni, durataSecondi);
+  res.json(pianificato);
+});
+
+app.get('/sessioni/:id/pianificati', richiedeAuth, async (req, res) => {
+  const lista = await getRoundPianificati(req.params.id);
+  res.json(lista);
+});
+
+app.post('/sessioni/:id/lancia-prossimo', richiedeAuth, async (req, res) => {
+  const round = await lanciaProssimoPianificato(req.params.id);
+  if (!round) return res.status(404).json({ errore: 'nessun round pianificato da lanciare' });
   res.json(round);
 });
 

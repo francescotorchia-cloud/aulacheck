@@ -33,4 +33,7 @@ CREATE TABLE IF NOT EXISTS round_pianificati (
   opzioni JSONB,
   ordine INTEGER NOT NULL,
   lanciato BOOLEAN NOT NULL DEFAULT false
+
+
+  ALTER TABLE round_pianificati ADD COLUMN IF NOT EXISTS durata_secondi INTEGER;
 );
