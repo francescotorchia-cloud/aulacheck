@@ -9,25 +9,48 @@
 </head>
 <body>
 
-  <main id="schermata-login" class="schermata">
-    <h1 class="logo">AulaCheck</h1>
-    <p class="sottotitolo">Accesso docente</p>
+<main id="schermata-login" class="schermata">
+  <h1 class="logo">AulaCheck</h1>
+  <p class="sottotitolo">Accesso docente</p>
+
+  <div class="card-form">
+    <label for="input-email">Email</label>
     <input type="email" id="input-email" placeholder="email@esempio.com" autocomplete="username">
-    <input type="password" id="input-password" placeholder="Password" autocomplete="current-password">
+
+    <label for="input-password">Password</label>
+    <input type="password" id="input-password" placeholder="••••••••" autocomplete="current-password">
+
     <button id="btn-login">Accedi</button>
     <p id="errore-login" class="errore"></p>
-  </main>
+  </div>
+</main>
+<main id="schermata-lista" class="schermata nascosta">
+  <h1 class="logo">AulaCheck</h1>
+  <p class="sottotitolo">Le tue sessioni</p>
 
-  <main id="schermata-crea" class="schermata nascosta">
-    <h1 class="logo">AulaCheck</h1>
-    <p class="sottotitolo">Nuova sessione</p>
-    <input type="text" id="input-titolo" placeholder="Titolo della lezione">
+  <div id="elenco-sessioni" class="elenco-sessioni"></div>
+
+  <button id="btn-nuova-sessione">Crea nuova sessione</button>
+</main>
+<main id="schermata-crea" class="schermata nascosta">
+  <h1 class="logo">AulaCheck</h1>
+  <p class="sottotitolo">Nuova sessione</p>
+
+  <div class="card-form">
+    <label for="input-titolo">Titolo della lezione</label>
+    <input type="text" id="input-titolo" placeholder="es. Introduzione a REST">
+
+    <label for="input-tipo">Tipo di sessione</label>
     <select id="input-tipo">
       <option value="comprehension">Comprensione (confuso / ok / perso)</option>
       <option value="debate">Dibattito (squadra A / squadra B / neutro)</option>
     </select>
+
     <button id="btn-crea">Crea sessione</button>
-  </main>
+  </div>
+
+  <button id="btn-annulla-crea" class="btn-secondario" style="margin-top: 0.8rem;">Annulla</button>
+</main>
 
   <main id="dashboard" class="dashboard nascosta">
     <header class="intestazione">

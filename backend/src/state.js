@@ -42,6 +42,34 @@ async function getSessionePerCodice(codice) {
   return await getSessione(risultato.rows[0].id);
 }
 
+async function getTutteLeSessioni() {
+  const risultato = await pool.query('SELECT id, tipo, titolo, codice, chiusa, creata_il FROM sessioni ORDER BY creata_il DESC');
+  return risultato.rows;
+}
+
+async function duplicaSessione(sessioneId) {
+  const originale = await pool.query('SELECT tipo, titolo FROM sessioni WHERE id = $1', [sessioneId]);
+  if (originale.rows.length === 0) return null;
+
+  const { tipo, titolo } = originale.rows[0];
+  const nuovaSessione = await creaSessione(tipo, `${titolo} (copia)`);
+
+  const pianificatiOriginali = await pool.query(
+    'SELECT etichetta, opzioni, ordine, durata_secondi FROM round_pianificati WHERE sessione_id = $1 ORDER BY ordine',
+    [sessioneId]
+  );
+
+  for (const p of pianificatiOriginali.rows) {
+    const opzioniParsate = p.opzioni ? p.opzioni : null;
+    await pool.query(
+      'INSERT INTO round_pianificati (id, sessione_id, etichetta, opzioni, ordine, lanciato, durata_secondi) VALUES ($1, $2, $3, $4, $5, false, $6)',
+      [generaId(), nuovaSessione.id, p.etichetta, opzioniParsate ? JSON.stringify(opzioniParsate) : null, p.ordine, p.durata_secondi]
+    );
+  }
+
+  return nuovaSessione;
+}
+
 async function getRoundAttivoArricchito(sessioneId) {
   const risultato = await pool.query(
     "SELECT * FROM round WHERE sessione_id = $1 AND stato = 'attivo' LIMIT 1",
@@ -62,6 +90,8 @@ async function getStorico(sessioneId) {
   }
   return rounds;
 }
+
+
 
 async function arricchisciRound(row) {
   const votiRisultato = await pool.query('SELECT client_id, valore FROM voti WHERE round_id = $1', [row.id]);
@@ -194,6 +224,14 @@ async function getRoundPianificati(sessioneId) {
   }));
 }
 
+async function ripianificaTutti(sessioneId) {
+  const risultato = await pool.query(
+    'UPDATE round_pianificati SET lanciato = false WHERE sessione_id = $1 AND lanciato = true',
+    [sessioneId]
+  );
+  return risultato.rowCount;
+}
+
 async function eliminaRoundPianificato(sessioneId, id) {
   const risultato = await pool.query(
     'DELETE FROM round_pianificati WHERE id = $1 AND sessione_id = $2 AND lanciato = false',
@@ -239,6 +277,8 @@ module.exports = {
   creaSessione,
   getSessione,
   getSessionePerCodice,
+  getTutteLeSessioni,
+  ripianificaTutti,
   avviaRound,
   chiudiRound,
   registraVoto,

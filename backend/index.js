@@ -4,8 +4,7 @@ const path = require('path');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const pool = require('./src/db');
-const { creaSessione, avviaRound, chiudiRound, getSessione, getSessionePerCodice, registraVoto, aggregaVoti, pianificaRound, getRoundPianificati, lanciaProssimoPianificato, eliminaRoundPianificato, spostaRoundPianificato } = require('./src/state');
-
+const { creaSessione, avviaRound, chiudiRound, getSessione, getSessionePerCodice, getTutteLeSessioni, ripianificaTutti, registraVoto, aggregaVoti, pianificaRound, getRoundPianificati, lanciaProssimoPianificato, eliminaRoundPianificato, spostaRoundPianificato } = require('./src/state');
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -55,11 +54,25 @@ app.post('/sessioni', richiedeAuth, async (req, res) => {
   res.json(sessione);
 });
 
+app.get('/sessioni', richiedeAuth, async (req, res) => {
+  const lista = await getTutteLeSessioni();
+  res.json(lista);
+});
+
+
 app.get('/sessioni/:id', async (req, res) => {
   const sessione = await getSessione(req.params.id);
   if (!sessione) return res.status(404).json({ errore: 'sessione non trovata' });
   res.json(sessione);
 });
+
+app.get('/sessioni/:id/apri', richiedeAuth, async (req, res) => {
+  await ripianificaTutti(req.params.id);
+  const sessione = await getSessione(req.params.id);
+  if (!sessione) return res.status(404).json({ errore: 'sessione non trovata' });
+  res.json(sessione);
+});
+
 
 app.get('/sessioni/codice/:codice', async (req, res) => {
   const codice = req.params.codice.toUpperCase();
