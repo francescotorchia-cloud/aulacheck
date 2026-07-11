@@ -1,13 +1,15 @@
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
+const cors = require('cors');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const pool = require('./src/db');
-const { creaSessione, avviaRound, chiudiRound, getSessione, getSessionePerCodice, getTutteLeSessioni, ripianificaTutti, registraVoto, aggregaVoti, pianificaRound, getRoundPianificati, lanciaProssimoPianificato, eliminaRoundPianificato, spostaRoundPianificato } = require('./src/state');
+const { creaSessione, avviaRound, chiudiRound, getSessione, getSessionePerCodice, getTutteLeSessioni, ripianificaTutti, eliminaSessione,chiudiSessione, registraVoto, aggregaVoti, pianificaRound, getRoundPianificati, lanciaProssimoPianificato, eliminaRoundPianificato, spostaRoundPianificato } = require('./src/state');
 const app = express();
 const port = process.env.PORT || 3000;
 
+app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../frontend')));
 
@@ -73,6 +75,17 @@ app.get('/sessioni/:id/apri', richiedeAuth, async (req, res) => {
   res.json(sessione);
 });
 
+app.delete('/sessioni/:id', richiedeAuth, async (req, res) => {
+  const eliminata = await eliminaSessione(req.params.id);
+  if (!eliminata) return res.status(404).json({ errore: 'sessione non trovata' });
+  res.json({ eliminata: true });
+});
+
+app.post('/sessioni/:id/chiudi', richiedeAuth, async (req, res) => {
+  const chiusa = await chiudiSessione(req.params.id);
+  if (!chiusa) return res.status(404).json({ errore: 'sessione non trovata' });
+  res.json({ chiusa: true });
+});
 
 app.get('/sessioni/codice/:codice', async (req, res) => {
   const codice = req.params.codice.toUpperCase();

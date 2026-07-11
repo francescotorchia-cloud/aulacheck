@@ -6,6 +6,7 @@
   <title>AulaCheck — Docente</title>
   <link rel="stylesheet" href="stile.css">
   <link rel="stylesheet" href="stile-docente.css">
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1/build/qrcode.min.js"></script>
 </head>
 <body>
 
@@ -24,7 +25,7 @@
     <p id="errore-login" class="errore"></p>
   </div>
 </main>
-<main id="schermata-lista" class="schermata nascosta">
+<main id="schermata-lista" class="schermata schermata-larga nascosta">
   <h1 class="logo">AulaCheck</h1>
   <p class="sottotitolo">Le tue sessioni</p>
 
@@ -40,43 +41,60 @@
     <label for="input-titolo">Titolo della lezione</label>
     <input type="text" id="input-titolo" placeholder="es. Introduzione a REST">
 
-    <label for="input-tipo">Tipo di sessione</label>
-    <select id="input-tipo">
-      <option value="comprehension">Comprensione (confuso / ok / perso)</option>
-      <option value="debate">Dibattito (squadra A / squadra B / neutro)</option>
-    </select>
 
     <button id="btn-crea">Crea sessione</button>
   </div>
 
   <button id="btn-annulla-crea" class="btn-secondario" style="margin-top: 0.8rem;">Annulla</button>
 </main>
+<main id="dashboard" class="dashboard nascosta">
 
-  <main id="dashboard" class="dashboard nascosta">
-    <header class="intestazione">
-      <div>
-        <h2 id="dash-titolo"></h2>
-        <p class="codice-grande">Codice: <span id="dash-codice"></span></p>
-      </div>
-    </header>
+
+<header class="intestazione">
+  <div>
+    <h2 id="dash-titolo"></h2>
+    <p class="codice-grande">Codice: <span id="dash-codice"></span></p>
+    <canvas id="qr-codice"></canvas>
+    <div class="azioni-intestazione">
+      <button id="btn-proietta" class="btn-secondario">Modalità proiezione</button>
+      <button id="btn-torna-lista" class="btn-secondario">← Torna alle sessioni</button>
+      <button id="btn-chiudi-sessione" class="btn-secondario btn-pericolo">Chiudi sessione</button>
+    </div>
+  </div>
+</header>
 
  <div id="due-colonne" class="due-colonne">
-  <section id="pannello-pianificazione" class="pannello">
-    <h3>Pianifica la lezione</h3>
-    <input type="text" id="input-etichetta-pianifica" placeholder="Etichetta round">
-    <input type="number" id="input-durata-pianifica" placeholder="Durata secondi" value="15" min="5">
-    <button id="btn-pianifica" class="btn-secondario">Aggiungi alla lista</button>
+<section id="pannello-pianificazione" class="pannello">
+  <h3>Pianifica la lezione</h3>
+  <input type="text" id="input-etichetta-pianifica" placeholder="Etichetta round">
 
-    <div id="lista-pianificati" class="lista-pianificati"></div>
+  <select id="input-tipo-round-pianifica">
+    <option value="comprehension">Comprensione (confuso / ok / perso)</option>
+    <option value="debate">Dibattito (squadra A / squadra B / neutro)</option>
+    <option value="truefalse">Vero o falso</option>
+    <option value="custom">Personalizzato</option>
+  </select>
+  <input type="text" id="input-opzioni-custom-pianifica" placeholder="opzione1, opzione2, opzione3" class="nascosta">
 
-    <button id="btn-round-successivo">Round successivo</button>
-  </section>
+  <input type="number" id="input-durata-pianifica" placeholder="Durata secondi" value="15" min="5">
+  <button id="btn-pianifica" class="btn-secondario">Aggiungi alla lista</button>
+
+  <div id="lista-pianificati" class="lista-pianificati"></div>
+
+  <button id="btn-round-successivo">Round successivo</button>
+</section>
 
   <div class="colonna-destra">
     <section id="pannello-avvio-rapido" class="pannello">
       <h3>Avvio rapido</h3>
       <p class="descrizione-pannello">Per un round improvvisato, senza pianificazione.</p>
       <input type="text" id="input-etichetta" placeholder="Etichetta round (facoltativa)">
+       <select id="input-tipo-round-veloce">
+    <option value="comprehension">Comprensione (confuso / ok / perso)</option>
+    <option value="debate">Dibattito (squadra A / squadra B / neutro)</option>
+    <option value="custom">Personalizzato</option>
+  </select>
+  <input type="text" id="input-opzioni-custom-veloce" placeholder="opzione1, opzione2, opzione3" class="nascosta">
       <input type="number" id="input-durata" placeholder="Durata secondi" value="15" min="5">
       <button id="btn-avvia-round" class="btn-secondario">Avvia subito</button>
     </section>
@@ -97,6 +115,13 @@
       <div id="risultati-live" class="risultati-live"></div>
     </section>
 
+        <div id="overlay-proiezione" class="overlay-proiezione nascosta">
+      <h1 class="logo-proiezione">AulaCheck</h1>
+      <h2 id="proiezione-titolo" class="titolo-proiezione"></h2>
+      <canvas id="qr-proiezione"></canvas>
+      <p class="codice-proiezione">Codice: <span id="proiezione-codice"></span></p>
+      <button id="btn-chiudi-proiezione" class="btn-secondario">Chiudi</button>
+    </div>
 
   </main>
 

@@ -1,3 +1,6 @@
+const parametriUrl = new URLSearchParams(location.search);
+const codiceDaUrl = parametriUrl.get('codice');
+
 const schermataCodice = document.getElementById('schermata-codice');
 const schermataAttesa = document.getElementById('schermata-attesa');
 const schermataVoto = document.getElementById('schermata-voto');
@@ -128,3 +131,8 @@ btnEntra.addEventListener('click', entraNellaSessione);
 inputCodice.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') entraNellaSessione();
 });
+
+if (codiceDaUrl) {
+  inputCodice.value = codiceDaUrl.toUpperCase();
+  entraNellaSessione();
+}

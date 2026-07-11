@@ -23,6 +23,10 @@ body {
   text-align: center;
 }
 
+.schermata-larga {
+  max-width: 600px;
+}
+
 .nascosta {
   display: none;
 }

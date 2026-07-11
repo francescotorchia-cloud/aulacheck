@@ -28,6 +28,11 @@
   text-align: left;
 }
 
+.pannello h3 {
+  font-size: 1.05rem;
+  margin-bottom: 0.8rem;
+}
+
 .pannello input,
 .pannello select {
   width: 100%;
@@ -38,6 +43,12 @@
   padding: 0.7rem;
   margin-bottom: 0.7rem;
   font-size: 1rem;
+}
+
+.descrizione-pannello {
+  color: #A8A6A0;
+  font-size: 0.85rem;
+  margin-bottom: 0.8rem;
 }
 
 .btn-secondario {
@@ -113,6 +124,8 @@
   padding: 0.7rem 0;
   font-size: 0.9rem;
 }
+
+/* Card round pianificati */
 
 .lista-pianificati {
   margin: 0.8rem 0;
@@ -209,10 +222,8 @@
 .controlli-voce button.elimina:hover:not(:disabled) {
   background: #2A1414;
 }
-.voce-pianificata.lanciata {
-  opacity: 0.5;
-  text-decoration: line-through;
-}
+
+/* Layout due colonne */
 
 .due-colonne {
   display: grid;
@@ -227,56 +238,13 @@
   gap: 1rem;
 }
 
-.pannello h3 {
-  font-size: 1.05rem;
-  margin-bottom: 0.8rem;
-}
-
-.descrizione-pannello {
-  color: #A8A6A0;
-  font-size: 0.85rem;
-  margin-bottom: 0.8rem;
-}
-
-.voce-pianificata .info-voce {
-  flex: 1;
-}
-
-.voce-pianificata .controlli-voce {
-  display: flex;
-  gap: 0.3rem;
-}
-
-.voce-pianificata .controlli-voce button {
-  width: 30px;
-  height: 30px;
-  padding: 0;
-  font-size: 1.1rem;
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: 1px solid #33383D;
-  color: #F2F0EB;
-  border-radius: 6px;
-  cursor: pointer;
-}
-.voce-pianificata .controlli-voce button:disabled {
-  opacity: 0.3;
-  cursor: default;
-}
-
-.voce-pianificata .controlli-voce button.elimina {
-  border-color: #E24B4A;
-  color: #E24B4A;
-}
-
 @media (max-width: 640px) {
   .due-colonne {
     grid-template-columns: 1fr;
   }
 }
+
+/* Card form (login / nuova sessione) */
 
 .card-form {
   background: #1E2226;
@@ -310,32 +278,58 @@
   width: 100%;
 }
 
+/* Elenco sessioni */
+
 .elenco-sessioni {
   margin: 1rem 0;
-  max-height: 400px;
+  max-height: 50vh;
   overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: #E8B341 #1E2226;
+}
+
+.elenco-sessioni::-webkit-scrollbar {
+  width: 8px;
+}
+
+.elenco-sessioni::-webkit-scrollbar-track {
+  background: #1E2226;
+  border-radius: 8px;
+}
+
+.elenco-sessioni::-webkit-scrollbar-thumb {
+  background: #E8B341;
+  border-radius: 8px;
 }
 
 .voce-sessione {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
   background: #1E2226;
   border: 1px solid #33383D;
   border-radius: 8px;
   padding: 0.8rem 1rem;
   margin-bottom: 0.6rem;
-  text-align: left;
-  cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .voce-sessione:hover {
   border-color: #E8B341;
 }
 
-.voce-sessione .titolo-sessione-voce {
+.titolo-sessione-voce {
   font-weight: 600;
   font-size: 1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.voce-sessione .dettagli-sessione-voce {
+.dettagli-sessione-voce {
   font-size: 0.8rem;
   color: #A8A6A0;
   font-family: 'IBM Plex Mono', monospace;
@@ -347,25 +341,119 @@
   justify-content: space-between;
   align-items: center;
   gap: 0.8rem;
+  width: 100%;
 }
 
-.riga-voce-sessione > div:first-child {
+.info-voce-sessione {
   flex: 1;
+  min-width: 0;
   cursor: pointer;
 }
 
-.btn-duplica-sessione {
+.btn-elimina-sessione {
+  width: auto;
   background: transparent;
-  border: 1px solid #33383D;
-  color: #A8A6A0;
+  border: 1px solid #E24B4A;
+  color: #E24B4A;
   font-size: 0.8rem;
-  padding: 0.4rem 0.7rem;
+  padding: 0.4rem 0.8rem;
   border-radius: 6px;
   cursor: pointer;
   flex-shrink: 0;
+  white-space: nowrap;
 }
 
-.btn-duplica-sessione:hover {
-  border-color: #E8B341;
+.btn-elimina-sessione:hover {
+  background: #2A1414;
+}
+
+.info-voce-sessione {
+  flex: 1;
+  min-width: 0;
+  cursor: pointer;
+  text-align: left;
+}
+
+.titolo-sessione-voce {
+  font-weight: 600;
+  font-size: 1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
+}
+
+.dettagli-sessione-voce {
+  font-size: 0.8rem;
+  color: #A8A6A0;
+  font-family: 'IBM Plex Mono', monospace;
+  margin-top: 0.2rem;
+  text-align: left;
+}
+
+
+.overlay-proiezione {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #14171A;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  z-index: 1000;
+}
+
+.overlay-proiezione.nascosta {
+  display: none;
+}
+
+.logo-proiezione {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 3rem;
+  font-weight: 700;
+  color: #F2F0EB;
+}
+
+.titolo-proiezione {
+  font-size: 2rem;
+  color: #A8A6A0;
+  text-align: center;
+}
+
+.codice-proiezione {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 2.5rem;
   color: #E8B341;
+  letter-spacing: 0.15em;
+}
+
+#qr-proiezione {
+  width: 320px !important;
+  height: 320px !important;
+}
+
+#btn-chiudi-proiezione {
+  width: auto;
+  padding: 0.8rem 2rem;
+}
+
+
+.azioni-intestazione {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.8rem;
+}
+
+.azioni-intestazione button {
+  width: auto;
+}
+
+.btn-pericolo {
+  border-color: #E24B4A;
+  color: #E24B4A;
 }

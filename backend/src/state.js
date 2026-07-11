@@ -4,7 +4,8 @@ const pool = require('./db');
 
 const OPZIONI_DEFAULT = {
   comprehension: ['confuso', 'ok', 'perso'],
-  debate: ['squadra A', 'squadra B', 'neutro']
+  debate: ['squadra A', 'squadra B', 'neutro'],
+  truefalse: ['vero', 'falso']
 };
 
 const timersAttivi = new Map();
@@ -47,28 +48,24 @@ async function getTutteLeSessioni() {
   return risultato.rows;
 }
 
-async function duplicaSessione(sessioneId) {
-  const originale = await pool.query('SELECT tipo, titolo FROM sessioni WHERE id = $1', [sessioneId]);
-  if (originale.rows.length === 0) return null;
-
-  const { tipo, titolo } = originale.rows[0];
-  const nuovaSessione = await creaSessione(tipo, `${titolo} (copia)`);
-
-  const pianificatiOriginali = await pool.query(
-    'SELECT etichetta, opzioni, ordine, durata_secondi FROM round_pianificati WHERE sessione_id = $1 ORDER BY ordine',
-    [sessioneId]
-  );
-
-  for (const p of pianificatiOriginali.rows) {
-    const opzioniParsate = p.opzioni ? p.opzioni : null;
-    await pool.query(
-      'INSERT INTO round_pianificati (id, sessione_id, etichetta, opzioni, ordine, lanciato, durata_secondi) VALUES ($1, $2, $3, $4, $5, false, $6)',
-      [generaId(), nuovaSessione.id, p.etichetta, opzioniParsate ? JSON.stringify(opzioniParsate) : null, p.ordine, p.durata_secondi]
-    );
-  }
-
-  return nuovaSessione;
+async function eliminaSessione(sessioneId) {
+  await pool.query('DELETE FROM voti WHERE round_id IN (SELECT id FROM round WHERE sessione_id = $1)', [sessioneId]);
+  await pool.query('DELETE FROM round WHERE sessione_id = $1', [sessioneId]);
+  await pool.query('DELETE FROM round_pianificati WHERE sessione_id = $1', [sessioneId]);
+  const risultato = await pool.query('DELETE FROM sessioni WHERE id = $1', [sessioneId]);
+  return risultato.rowCount > 0;
 }
+
+ async function chiudiSessione(sessioneId) {
+   const roundAttivo = await getRoundAttivoArricchito(sessioneId);
+   if (roundAttivo) {
+        await chiudiRound(sessioneId);
+        }
+
+   const risultato = await pool.query('UPDATE sessioni SET chiusa = true WHERE id = $1', [sessioneId]);
+      return risultato.rowCount > 0;
+      }
+
 
 async function getRoundAttivoArricchito(sessioneId) {
   const risultato = await pool.query(
@@ -279,6 +276,8 @@ module.exports = {
   getSessionePerCodice,
   getTutteLeSessioni,
   ripianificaTutti,
+  eliminaSessione,
+  chiudiSessione,
   avviaRound,
   chiudiRound,
   registraVoto,
