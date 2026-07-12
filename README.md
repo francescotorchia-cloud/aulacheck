@@ -208,3 +208,7 @@ Alcune scelte tecniche sono state fatte consapevolmente per restare nei tempi di
 - **Registrazione docente aperta, senza verifica dell'identità**: chiunque può registrarsi come docente, senza conferma email o approvazione. Accettabile per lo scope del progetto (nessun dato sensibile in gioco, nessuna azione irreversibile su terzi); un sistema in produzione con utenti reali richiederebbe un meccanismo di verifica.
 - **Confronto tra sessioni diverse non implementato**: l'analisi mostra statistiche aggregate per singola sessione; un confronto storico tra più sessioni nel tempo (per vedere se un argomento resta problematico su più lezioni) è uno sviluppo naturale non ancora realizzato.
 - **Nessun test di carico reale**: le 20-40 connessioni WebSocket simultanee attese in un'aula non sono state testate con carico reale, solo con poche connessioni durante lo sviluppo.
+
+**Demo live**: [https://aulacheck-n5lw.onrender.com](https://aulacheck-n5lw.onrender.com)
+
+> Nota: il servizio gratuito Render "si addormenta" dopo un periodo di inattività — la prima richiesta dopo una pausa può richiedere fino a 50 secondi per rispondere.
