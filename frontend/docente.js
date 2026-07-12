@@ -53,13 +53,21 @@ const schermataLogin = document.getElementById('schermata-login');
     const inputOpzioniCustomVeloce = document.getElementById('input-opzioni-custom-veloce');
     const erroreRiprendi = document.getElementById('errore-riprendi');
 
+    const schermataRegistrazione = document.getElementById('schermata-registrazione');
+    const btnVaiRegistrazione = document.getElementById('btn-vai-registrazione');
+    const btnTornaLogin = document.getElementById('btn-torna-login');
+    const inputEmailReg = document.getElementById('input-email-reg');
+    const inputPasswordReg = document.getElementById('input-password-reg');
+    const btnRegistrati = document.getElementById('btn-registrati');
+    const erroreRegistrazione = document.getElementById('errore-registrazione');
+
     let token = null;
     let sessioneId = null;
     let ws = null;
     let intervalloTimer = null;
 
     function mostraSchermata(schermata) {
-      [schermataLogin, schermataLista, schermataCrea, dashboard].forEach(s => s.classList.add('nascosta'));
+      [schermataLogin,schermataRegistrazione, schermataLista, schermataCrea, dashboard].forEach(s => s.classList.add('nascosta'));
       schermata.classList.remove('nascosta');
     }
 
@@ -98,6 +106,22 @@ const schermataLogin = document.getElementById('schermata-login');
         erroreLogin.textContent = 'Credenziali non valide';
       }
     }
+
+    async function registrati() {
+      try {
+        const dati = await fai('/registrazione', {
+          method: 'POST',
+          body: JSON.stringify({ email: inputEmailReg.value, password: inputPasswordReg.value })
+        });
+        token = dati.token;
+        await mostraElencoSessioni();
+      } catch (e) {
+        erroreRegistrazione.textContent = e.message || 'Errore nella registrazione';
+      }
+    }
+
+
+
     async function mostraElencoSessioni() {
       const lista = await fai('/sessioni');
 
@@ -414,3 +438,7 @@ btnTornaLista.addEventListener('click', async () => {
   await mostraElencoSessioni();
 });
 btnChiudiSessione.addEventListener('click', chiudiSessioneConConferma);
+
+btnVaiRegistrazione.addEventListener('click', () => mostraSchermata(schermataRegistrazione));
+btnTornaLogin.addEventListener('click', () => mostraSchermata(schermataLogin));
+btnRegistrati.addEventListener('click', registrati);

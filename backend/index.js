@@ -5,9 +5,10 @@ const cors = require('cors');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const pool = require('./src/db');
-const { creaSessione, avviaRound, chiudiRound, getSessione, getSessionePerCodice, getTutteLeSessioni, ripianificaTutti, eliminaSessione,chiudiSessione, registraVoto, aggregaVoti, pianificaRound, getRoundPianificati, lanciaProssimoPianificato, eliminaRoundPianificato, spostaRoundPianificato } = require('./src/state');
+const { creaSessione, avviaRound, chiudiRound, getSessione, getSessionePerCodice, getTutteLeSessioni, ripianificaTutti, eliminaSessione, chiudiSessione, registraDocente, getDocentePerEmail, registraVoto, aggregaVoti, pianificaRound, getRoundPianificati, lanciaProssimoPianificato, eliminaRoundPianificato, spostaRoundPianificato } = require('./src/state');
 const app = express();
 const port = process.env.PORT || 3000;
+
 
 app.use(cors());
 app.use(express.json());
@@ -32,32 +33,56 @@ app.get('/health', (req, res) => {
   res.json({ status: 'up' });
 });
 
+app.post('/registrazione', async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password || password.length < 4) {
+    return res.status(400).json({ errore: 'email e password (almeno 4 caratteri) sono obbligatori' });
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return res.status(400).json({ errore: 'formato email non valido' });
+  }
+
+  const esistente = await getDocentePerEmail(email);
+  if (esistente) {
+    return res.status(409).json({ errore: 'email già registrata' });
+  }
+
+  const passwordHash = await bcrypt.hash(password, 10);
+  const docente = await registraDocente(email, passwordHash);
+
+  const token = jwt.sign({ ruolo: 'docente', docenteId: docente.id }, process.env.JWT_SECRET, { expiresIn: '8h' });
+  res.json({ token });
+});
+
 
 
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
-  if (email !== process.env.DOCENTE_EMAIL) {
+  const docente = await getDocentePerEmail(email);
+  if (!docente) {
     return res.status(401).json({ errore: 'credenziali non valide' });
   }
 
-  const passwordCorretta = await bcrypt.compare(password, process.env.DOCENTE_PASSWORD_HASH);
+  const passwordCorretta = await bcrypt.compare(password, docente.password_hash);
   if (!passwordCorretta) {
     return res.status(401).json({ errore: 'credenziali non valide' });
   }
 
-  const token = jwt.sign({ ruolo: 'docente' }, process.env.JWT_SECRET, { expiresIn: '8h' });
+  const token = jwt.sign({ ruolo: 'docente', docenteId: docente.id }, process.env.JWT_SECRET, { expiresIn: '8h' });
   res.json({ token });
 });
 
 app.post('/sessioni', richiedeAuth, async (req, res) => {
   const { tipo, titolo } = req.body;
-  const sessione = await creaSessione(tipo, titolo);
+  const sessione = await creaSessione(tipo, titolo, req.docente.docenteId);
   res.json(sessione);
 });
 
 app.get('/sessioni', richiedeAuth, async (req, res) => {
-  const lista = await getTutteLeSessioni();
+  const lista = await getTutteLeSessioni(req.docente.docenteId);
   res.json(lista);
 });
 

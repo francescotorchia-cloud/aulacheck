@@ -14,16 +14,30 @@ function generaId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 }
 
-async function creaSessione(tipo, titolo) {
+async function creaSessione(tipo, titolo, docenteId) {
   const id = generaId();
   const codice = Math.random().toString(36).slice(2, 8).toUpperCase();
 
   await pool.query(
-    'INSERT INTO sessioni (id, tipo, titolo, codice) VALUES ($1, $2, $3, $4)',
-    [id, tipo, titolo, codice]
+    'INSERT INTO sessioni (id, tipo, titolo, codice, docente_id) VALUES ($1, $2, $3, $4, $5)',
+    [id, tipo, titolo, codice, docenteId]
   );
 
   return { id, tipo, titolo, codice, chiusa: false, roundAttivo: null, storico: [] };
+}
+
+async function registraDocente(email, passwordHash) {
+  const id = generaId();
+  await pool.query(
+    'INSERT INTO docenti (id, email, password_hash) VALUES ($1, $2, $3)',
+    [id, email, passwordHash]
+  );
+  return { id, email };
+}
+
+async function getDocentePerEmail(email) {
+  const risultato = await pool.query('SELECT * FROM docenti WHERE email = $1', [email]);
+  return risultato.rows[0] || null;
 }
 
 async function getSessione(id) {
@@ -43,8 +57,11 @@ async function getSessionePerCodice(codice) {
   return await getSessione(risultato.rows[0].id);
 }
 
-async function getTutteLeSessioni() {
-  const risultato = await pool.query('SELECT id, tipo, titolo, codice, chiusa, creata_il FROM sessioni ORDER BY creata_il DESC');
+async function getTutteLeSessioni(docenteId) {
+  const risultato = await pool.query(
+    'SELECT id, tipo, titolo, codice, chiusa, creata_il FROM sessioni WHERE docente_id = $1 ORDER BY creata_il DESC',
+    [docenteId]
+  );
   return risultato.rows;
 }
 
@@ -278,6 +295,8 @@ module.exports = {
   ripianificaTutti,
   eliminaSessione,
   chiudiSessione,
+  registraDocente,
+  getDocentePerEmail,
   avviaRound,
   chiudiRound,
   registraVoto,

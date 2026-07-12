@@ -37,3 +37,12 @@ CREATE TABLE IF NOT EXISTS round_pianificati (
 
   ALTER TABLE round_pianificati ADD COLUMN IF NOT EXISTS durata_secondi INTEGER;
 );
+
+CREATE TABLE IF NOT EXISTS docenti (
+  id TEXT PRIMARY KEY,
+  email TEXT UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL,
+  creato_il TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+ALTER TABLE sessioni ADD COLUMN IF NOT EXISTS docente_id TEXT REFERENCES docenti(id);
