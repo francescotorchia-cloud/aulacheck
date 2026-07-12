@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout del codice
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Installa dipendenze backend
+        working-directory: backend
+        run: npm install
+
+      - name: Costruisci immagine Docker
+        run: docker build -t aulacheck-backend -f backend/Dockerfile .
+
+      - name: Verifica avvio del server
+        run: |
+          docker run -d -p 3000:3000 \
+            -e PORT=3000 \
+            -e JWT_SECRET=test-secret-per-ci \
+            -e DATABASE_URL=postgres://fake:fake@fake:5432/fake \
+            --name test-backend aulacheck-backend
+          sleep 3
+          docker logs test-backend
+          docker stop test-backend
