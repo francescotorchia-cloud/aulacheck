@@ -181,6 +181,46 @@ function aggregaVoti(round) {
   return conteggio;
 }
 
+function calcolaAnalisiSessione(storico) {
+  const totaleRound = storico.length;
+  let totaleVoti = 0;
+  let votiOk = 0;
+  let votiConfuso = 0;
+  let votiPerso = 0;
+  let roundComprensione = 0;
+
+  const opzioniComprensione = ['confuso', 'ok', 'perso'];
+
+  storico.forEach(round => {
+    const numeroVotiRound = Object.keys(round.voti).length;
+    totaleVoti += numeroVotiRound;
+
+    const eComprensione = round.opzioni.length === 3 &&
+      opzioniComprensione.every(o => round.opzioni.includes(o));
+
+    if (eComprensione) {
+      roundComprensione++;
+      Object.values(round.voti).forEach(v => {
+        if (v === 'ok') votiOk++;
+        if (v === 'confuso') votiConfuso++;
+        if (v === 'perso') votiPerso++;
+      });
+    }
+  });
+
+  const totaleVotiComprensione = votiOk + votiConfuso + votiPerso;
+  const comprensionePercentuale = totaleVotiComprensione > 0
+    ? Math.round(((votiOk + votiConfuso * 0.5) / totaleVotiComprensione) * 100)
+    : null;
+
+  return {
+    totaleRound,
+    totaleVoti,
+    roundComprensione,
+    comprensionePercentuale
+  };
+}
+
 async function chiudiRound(sessioneId) {
   const roundAttivo = await getRoundAttivoArricchito(sessioneId);
   if (!roundAttivo) return null;
@@ -301,6 +341,7 @@ module.exports = {
   chiudiRound,
   registraVoto,
   aggregaVoti,
+  calcolaAnalisiSessione,
   pianificaRound,
   getRoundPianificati,
   lanciaProssimoPianificato,

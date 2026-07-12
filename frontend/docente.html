@@ -121,8 +121,8 @@
     </section>
 
     <section class="pannello">
-      <button id="btn-storico" class="btn-secondario">Mostra storico</button>
-      <div id="lista-storico" class="lista-storico nascosta"></div>
+      <p class="descrizione-pannello">L'analisi di questa sessione è disponibile dalla lista sessioni.</p>
+  </div>
     </section>
   </div>
 </div>
@@ -136,15 +136,26 @@
       <div id="risultati-live" class="risultati-live"></div>
     </section>
 
-        <div id="overlay-proiezione" class="overlay-proiezione nascosta">
-      <h1 class="logo-proiezione">AulaCheck</h1>
-      <h2 id="proiezione-titolo" class="titolo-proiezione"></h2>
-      <canvas id="qr-proiezione"></canvas>
-      <p class="codice-proiezione">Codice: <span id="proiezione-codice"></span></p>
-      <button id="btn-chiudi-proiezione" class="btn-secondario">Chiudi</button>
-    </div>
-
   </main>
+
+  <div id="overlay-proiezione" class="overlay-proiezione nascosta">
+    <h1 class="logo-proiezione">AulaCheck</h1>
+    <h2 id="proiezione-titolo" class="titolo-proiezione"></h2>
+    <canvas id="qr-proiezione"></canvas>
+    <p class="codice-proiezione">Codice: <span id="proiezione-codice"></span></p>
+    <button id="btn-chiudi-proiezione" class="btn-secondario">Chiudi</button>
+  </div>
+
+  <div id="overlay-analisi" class="overlay-analisi nascosta">
+    <div class="contenuto-overlay-analisi">
+      <div class="intestazione-overlay-analisi">
+        <h2 id="analisi-titolo-sessione"></h2>
+        <button id="btn-chiudi-analisi" class="btn-secondario">Chiudi</button>
+      </div>
+      <div id="riepilogo-analisi" class="riepilogo-analisi"></div>
+      <div id="lista-storico" class="lista-storico"></div>
+    </div>
+  </div>
 
   <script src="docente.js"></script>
 </body>

@@ -5,7 +5,7 @@ const cors = require('cors');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const pool = require('./src/db');
-const { creaSessione, avviaRound, chiudiRound, getSessione, getSessionePerCodice, getTutteLeSessioni, ripianificaTutti, eliminaSessione, chiudiSessione, registraDocente, getDocentePerEmail, registraVoto, aggregaVoti, pianificaRound, getRoundPianificati, lanciaProssimoPianificato, eliminaRoundPianificato, spostaRoundPianificato } = require('./src/state');
+const { creaSessione, avviaRound, chiudiRound, getSessione, getSessionePerCodice, getTutteLeSessioni, ripianificaTutti, eliminaSessione, chiudiSessione, registraDocente, getDocentePerEmail, registraVoto, aggregaVoti, calcolaAnalisiSessione, pianificaRound, getRoundPianificati, lanciaProssimoPianificato, eliminaRoundPianificato, spostaRoundPianificato } = require('./src/state');
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -173,6 +173,14 @@ app.get('/sessioni/:id/storico', richiedeAuth, async (req, res) => {
   const sessione = await getSessione(req.params.id);
   if (!sessione) return res.status(404).json({ errore: 'sessione non trovata' });
   res.json(sessione.storico);
+});
+
+app.get('/sessioni/:id/analisi', richiedeAuth, async (req, res) => {
+  const sessione = await getSessione(req.params.id);
+  if (!sessione) return res.status(404).json({ errore: 'sessione non trovata' });
+
+  const analisi = calcolaAnalisiSessione(sessione.storico);
+  res.json({ storico: sessione.storico, analisi });
 });
 
 const http = require('http');

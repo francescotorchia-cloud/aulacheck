@@ -35,8 +35,10 @@ const schermataLogin = document.getElementById('schermata-login');
     const dashEtichetta = document.getElementById('dash-etichetta');
     const risultatiLive = document.getElementById('risultati-live');
 
-    const btnStorico = document.getElementById('btn-storico');
     const listaStorico = document.getElementById('lista-storico');
+    const overlayAnalisi = document.getElementById('overlay-analisi');
+    const analisiTitoloSessione = document.getElementById('analisi-titolo-sessione');
+    const btnChiudiAnalisi = document.getElementById('btn-chiudi-analisi');
 
     const inputEtichettaPianifica = document.getElementById('input-etichetta-pianifica');
     const inputDurataPianifica = document.getElementById('input-durata-pianifica');
@@ -137,9 +139,14 @@ const schermataLogin = document.getElementById('schermata-login');
               <div class="titolo-sessione-voce">${s.titolo || '(senza titolo)'}</div>
               <div class="dettagli-sessione-voce">${s.codice} · ${s.tipo}</div>
             </div>
+            <button class="btn-analisi-sessione">Analisi</button>
             <button class="btn-elimina-sessione">Elimina</button>
           `;
           voce.querySelector('.info-voce-sessione').addEventListener('click', () => apriSessioneEsistente(s.id));
+          voce.querySelector('.btn-analisi-sessione').addEventListener('click', (e) => {
+            e.stopPropagation();
+            mostraAnalisi(s.id, s.titolo || '(senza titolo)');
+          });
           voce.querySelector('.btn-elimina-sessione').addEventListener('click', (e) => {
             e.stopPropagation();
             eliminaSessioneConConferma(s.id, s.titolo || 'questa sessione');
@@ -394,19 +401,67 @@ function disegnaRisultati(conteggio) {
 async function chiudiRound() {
   await fai(`/sessioni/${sessioneId}/round/chiudi`, { method: 'POST' });
 }
+async function mostraAnalisi(id, titolo) {
+  const dati = await fai(`/sessioni/${id}/analisi`);
+  const riepilogoAnalisi = document.getElementById('riepilogo-analisi');
 
-async function mostraStorico() {
-  const storico = await fai(`/sessioni/${sessioneId}/storico`);
+  analisiTitoloSessione.textContent = titolo;
+
+  riepilogoAnalisi.innerHTML = `
+    <div class="riga-statistiche">
+      <div class="statistica">
+        <span class="etichetta-statistica">Round totali</span>
+        <span class="valore-statistica">${dati.analisi.totaleRound}</span>
+      </div>
+      <div class="statistica">
+        <span class="etichetta-statistica">Voti raccolti</span>
+        <span class="valore-statistica">${dati.analisi.totaleVoti}</span>
+      </div>
+      ${dati.analisi.comprensionePercentuale !== null ? `
+        <div class="statistica">
+          <span class="etichetta-statistica">Comprensione media</span>
+          <span class="numero-grande-analisi">${dati.analisi.comprensionePercentuale}%</span>
+        </div>
+      ` : ''}
+    </div>
+  `;
 
   listaStorico.innerHTML = '';
-  storico.forEach(round => {
-    const voce = document.createElement('div');
-    voce.className = 'voce-storico';
-    const conteggio = Object.entries(aggregaLocale(round)).map(([o, v]) => `${o}: ${v}`).join(', ');
-    voce.textContent = `${round.etichetta || '(senza etichetta)'} — ${conteggio}`;
-    listaStorico.appendChild(voce);
+  dati.storico.forEach(round => {
+    const conteggio = aggregaLocale(round);
+    const totale = Object.values(conteggio).reduce((a, b) => a + b, 0) || 1;
+    const dataRound = new Date(round.terminatoIl).toLocaleString('it-IT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+
+    const card = document.createElement('div');
+    card.className = 'card-round-storico';
+
+    let barreHtml = '';
+    for (const [opzione, valore] of Object.entries(conteggio)) {
+      const percentuale = Math.round((valore / totale) * 100);
+      barreHtml += `
+        <div class="barra-risultato">
+          <span class="etichetta-opzione">${opzione}</span>
+          <div class="barra-contenitore"><div class="barra-riempimento" style="width:${percentuale}%"></div></div>
+          <span class="conteggio">${valore}</span>
+        </div>
+      `;
+    }
+
+    card.innerHTML = `
+      <div class="intestazione-round-storico">
+        <span class="etichetta-round-storico">${round.etichetta || '(senza etichetta)'}</span>
+        <span class="data-round-storico">${dataRound}</span>
+      </div>
+      ${barreHtml}
+    `;
+    listaStorico.appendChild(card);
   });
-  listaStorico.classList.remove('nascosta');
+
+  overlayAnalisi.classList.remove('nascosta');
+}
+
+function chiudiAnalisi() {
+  overlayAnalisi.classList.add('nascosta');
 }
 
 function aggregaLocale(round) {
@@ -421,24 +476,25 @@ btnCrea.addEventListener('click', creaSessione);
 btnNuovaSessione.addEventListener('click', () => mostraSchermata(schermataCrea));
 btnAnnullaCrea.addEventListener('click', () => mostraSchermata(schermataLista));
 btnAvviaRound.addEventListener('click', avviaRound);
-btnChiudiRound.addEventListener('click', chiudiRound);
-btnStorico.addEventListener('click', mostraStorico);
-btnPianifica.addEventListener('click', pianificaRound);
-btnRoundSuccessivo.addEventListener('click', lanciaRoundSuccessivo);
-inputTipoRoundPianifica.addEventListener('change', () => {
-  inputOpzioniCustomPianifica.classList.toggle('nascosta', inputTipoRoundPianifica.value !== 'custom');
-});
-inputTipoRoundVeloce.addEventListener('change', () => {
-  inputOpzioniCustomVeloce.classList.toggle('nascosta', inputTipoRoundVeloce.value !== 'custom');
-});
-btnProietta.addEventListener('click', apriProiezione);
-btnChiudiProiezione.addEventListener('click', chiudiProiezione);
-btnTornaLista.addEventListener('click', async () => {
-  if (ws) ws.close();
-  await mostraElencoSessioni();
-});
+    btnChiudiRound.addEventListener('click', chiudiRound);
+    btnPianifica.addEventListener('click', pianificaRound);
+    btnRoundSuccessivo.addEventListener('click', lanciaRoundSuccessivo);
+    inputTipoRoundPianifica.addEventListener('change', () => {
+      inputOpzioniCustomPianifica.classList.toggle('nascosta', inputTipoRoundPianifica.value !== 'custom');
+    });
+    inputTipoRoundVeloce.addEventListener('change', () => {
+      inputOpzioniCustomVeloce.classList.toggle('nascosta', inputTipoRoundVeloce.value !== 'custom');
+    });
+    btnProietta.addEventListener('click', apriProiezione);
+    btnChiudiProiezione.addEventListener('click', chiudiProiezione);
+    btnTornaLista.addEventListener('click', async () => {
+      if (ws) ws.close();
+    await mostraElencoSessioni();
+  });
 btnChiudiSessione.addEventListener('click', chiudiSessioneConConferma);
 
 btnVaiRegistrazione.addEventListener('click', () => mostraSchermata(schermataRegistrazione));
 btnTornaLogin.addEventListener('click', () => mostraSchermata(schermataLogin));
 btnRegistrati.addEventListener('click', registrati);
+
+btnChiudiAnalisi.addEventListener('click', chiudiAnalisi);
