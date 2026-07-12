@@ -6,7 +6,7 @@ Progetto sviluppato per l'esame di **Applicazioni Web, Mobile e Cloud** (Informa
 
 ## Indice
 
-- [Funzionalità]
+- [Funzionalità](#funzionalità)
 - [Stack tecnico](#stack-tecnico)
 - [Architettura](#architettura)
 - [Avvio rapido (Docker)](#avvio-rapido-docker)
