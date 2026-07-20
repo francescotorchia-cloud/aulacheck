@@ -86,6 +86,12 @@ const schermataLogin = document.getElementById('schermata-login');
         return null;
     }
 
+    function escapeHTML(testo) {
+      const div = document.createElement('div');
+      div.textContent = testo;
+      return div.innerHTML;
+    }
+
     async function fai(url, opzioni = {}) {
       const headers = { 'Content-Type': 'application/json', ...(opzioni.headers || {}) };
       if (token) headers.Authorization = `Bearer ${token}`;
@@ -136,7 +142,7 @@ const schermataLogin = document.getElementById('schermata-login');
           voce.className = 'voce-sessione';
           voce.innerHTML = `
             <div class="info-voce-sessione">
-              <div class="titolo-sessione-voce">${s.titolo || '(senza titolo)'}</div>
+              <div class="titolo-sessione-voce">${escapeHTML(s.titolo || '(senza titolo)')}</div>
               <div class="dettagli-sessione-voce">${s.codice} · ${s.tipo}</div>
             </div>
             <button class="btn-analisi-sessione">Analisi</button>
@@ -267,7 +273,7 @@ const schermataLogin = document.getElementById('schermata-login');
         voce.innerHTML = `
         <span class="numero-ordine">${p.ordine}</span>
         <span class="info-voce">
-        <span class="etichetta-voce">${p.etichetta || '(senza etichetta)'}</span>
+        <span class="etichetta-voce">${escapeHTML(p.etichetta || '(senza etichetta)')}</span>
         <span class="durata-voce">${p.durataSecondi}s</span>
         </span>
         <span class="controlli-voce">
@@ -379,7 +385,7 @@ function disegnaRisultati(conteggio) {
     const riga = document.createElement('div');
     riga.className = 'barra-risultato';
     riga.innerHTML = `
-      <span class="etichetta-opzione">${opzione}</span>
+      <span class="etichetta-opzione">${escapeHTML(opzione)}</span>
       <div class="barra-contenitore"><div class="barra-riempimento" style="width:${percentuale}%"></div></div>
       <span class="conteggio">${valore}</span>
     `;
@@ -440,7 +446,7 @@ async function mostraAnalisi(id, titolo) {
       const percentuale = Math.round((valore / totale) * 100);
       barreHtml += `
         <div class="barra-risultato">
-          <span class="etichetta-opzione">${opzione}</span>
+          <span class="etichetta-opzione">${escapeHTML(opzione)}</span>
           <div class="barra-contenitore"><div class="barra-riempimento" style="width:${percentuale}%"></div></div>
           <span class="conteggio">${valore}</span>
         </div>
@@ -449,7 +455,7 @@ async function mostraAnalisi(id, titolo) {
 
     card.innerHTML = `
       <div class="intestazione-round-storico">
-        <span class="etichetta-round-storico">${round.etichetta || '(senza etichetta)'}</span>
+        <span class="etichetta-round-storico">${escapeHTML(round.etichetta || '(senza etichetta)')}</span>
         <span class="data-round-storico">${dataRound}</span>
       </div>
       ${barreHtml}
