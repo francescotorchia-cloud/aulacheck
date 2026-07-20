@@ -15,7 +15,11 @@ const etichettaRoundEl = document.getElementById('etichetta-round');
 const opzioniVotoEl = document.getElementById('opzioni-voto');
 const statoVotoEl = document.getElementById('stato-voto');
 
-const clientId = 'studente-' + Math.random().toString(36).slice(2, 10);
+let clientId = localStorage.getItem('aulacheck_clientId');
+if (!clientId) {
+  clientId = 'studente-' + Math.random().toString(36).slice(2, 10);
+  localStorage.setItem('aulacheck_clientId', clientId);
+}
 
 let sessioneId = null;
 let ws = null;
